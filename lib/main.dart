@@ -26,7 +26,7 @@ class App extends StatelessWidget {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       theme: theme,
-      home: MealsScreen(title: 'Some Category', meals: dummyMeals), // Todo ...,
-    );
+      home: CategoriesScreen(),
+    ); // Todo ...,
   }
 }

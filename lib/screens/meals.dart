@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:meal_app/model/meal.dart';
+import 'package:meal_app/widgets/meal_item.dart';
 
 class MealsScreen extends StatelessWidget {
   const MealsScreen({super.key, required this.title, required this.meals});
@@ -8,12 +9,8 @@ class MealsScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    Widget content = ListView.builder(
-      itemBuilder: (context, index) {
-        return Text(meals[index].title);
-      },
-      itemCount: meals.length,
-    );
+    Widget content;
+
     if (meals.isEmpty) {
       content = Center(
         child: Column(
@@ -24,25 +21,26 @@ class MealsScreen extends StatelessWidget {
               style: Theme.of(context).textTheme.headlineLarge!.copyWith(
                 color: Theme.of(context).colorScheme.onBackground,
               ),
+              textAlign: TextAlign.center,
             ),
-            SizedBox(height: 16),
+            const SizedBox(height: 16),
             Text(
               'Try selecting different meal.',
               style: Theme.of(context).textTheme.bodyLarge!.copyWith(
                 color: Theme.of(context).colorScheme.onBackground,
               ),
+              textAlign: TextAlign.center,
             ),
           ],
         ),
       );
-      if (meals.isNotEmpty) {
-        content = ListView.builder(
-          itemCount: meals.length,
-          itemBuilder: (context, index) {
-            return Text(meals[index].title);
-          },
-        );
-      }
+    } else {
+      content = ListView.builder(
+        itemCount: meals.length,
+        itemBuilder: (context, index) {
+          return MealItem(meal: meals[index]); // <-- return the widget
+        },
+      );
     }
 
     return Scaffold(
