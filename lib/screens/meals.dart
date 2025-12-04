@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:meal_app/model/meal.dart';
-import 'package:meal_app/screens/meal_details.dart';
 import 'package:meal_app/widgets/meal_item.dart';
 
 class MealsScreen extends StatelessWidget {
@@ -8,22 +7,15 @@ class MealsScreen extends StatelessWidget {
     super.key,
     this.title,
     required this.meals,
-    required this.selectMeal, // ✅ FIX: Added in constructor
+    required this.selectMeal,
   });
 
   final String? title;
   final List<Meal> meals;
-  final void Function(BuildContext, Meal) selectMeal;
 
-  void onSelectMeal(BuildContext context, Meal meal) {
-    Navigator.of(context).push(
-      MaterialPageRoute(
-        builder: (_) => MealDetailsScreen(
-          meal: meal,
-        ), // ✅ FIX: Go to MealDetailsScreen, not MealItem
-      ),
-    );
-  }
+  /// This callback is provided by the parent (TabsScreen / CategoriesScreen)
+  /// and is responsible for handling navigation to MealDetailsScreen.
+  final void Function(BuildContext, Meal) selectMeal;
 
   @override
   Widget build(BuildContext context) {
@@ -43,7 +35,7 @@ class MealsScreen extends StatelessWidget {
             ),
             const SizedBox(height: 16),
             Text(
-              'Try selecting different meal.',
+              'Try selecting a different meal.',
               style: Theme.of(context).textTheme.bodyLarge!.copyWith(
                 color: Theme.of(context).colorScheme.onBackground,
               ),
@@ -55,17 +47,23 @@ class MealsScreen extends StatelessWidget {
     } else {
       content = ListView.builder(
         itemCount: meals.length,
-        itemBuilder: (context, index) {
+        itemBuilder: (ctx, index) {
+          final meal = meals[index];
           return MealItem(
-            meal: meals[index],
-            onSelectMeal: (meal) => onSelectMeal(context, meal),
+            meal: meal,
+            onSelectMeal: (meal) {
+              // Delegate handling to parent via callback
+              selectMeal(ctx, meal);
+            },
           );
         },
       );
     }
+
     if (title == null) {
       return content;
     }
+
     return Scaffold(
       appBar: AppBar(title: Text(title!)),
       body: content,

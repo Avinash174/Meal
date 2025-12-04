@@ -23,7 +23,7 @@ class App extends StatelessWidget {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       theme: theme,
-      home: TabsScree(),
+      home: TabsScreen(),
     ); // Todo ...,
   }
 }
