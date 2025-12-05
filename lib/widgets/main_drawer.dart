@@ -42,11 +42,9 @@ class MainDrawer extends StatelessWidget {
           ),
           ListTile(
             leading: const Icon(Icons.restaurant),
-            title: const Text('Meals'),
+            title: const Text('Meals', style: TextStyle(color: Colors.white)),
             onTap: () {
-              // ✅ close drawer
               Navigator.of(context).pop();
-              // ✅ tell TabsScreen to show meals tab
               onSelectScreen('meals');
             },
           ),
@@ -54,9 +52,7 @@ class MainDrawer extends StatelessWidget {
             leading: const Icon(Icons.settings),
             title: const Text('Filters'),
             onTap: () {
-              // ✅ close drawer
               Navigator.of(context).pop();
-              // ✅ tell TabsScreen to navigate to FiltersScreen
               onSelectScreen('filters');
             },
           ),

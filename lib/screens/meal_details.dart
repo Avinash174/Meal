@@ -5,11 +5,13 @@ class MealDetailsScreen extends StatelessWidget {
   const MealDetailsScreen({
     super.key,
     required this.meal,
-    required this.toggleFavourite, required bool isFavourite,
+    required this.toggleFavourite,
+    required this.isFavourite,
   });
 
   final Meal meal;
   final void Function(Meal meal)? toggleFavourite;
+  final bool isFavourite;
 
   @override
   Widget build(BuildContext context) {
@@ -23,12 +25,18 @@ class MealDetailsScreen extends StatelessWidget {
                 toggleFavourite!(meal);
               }
             },
-            icon: Icon(Icons.star),
+            icon: Icon(
+              isFavourite ? Icons.star : Icons.star_border,
+              color: isFavourite
+                  ? Theme.of(context).colorScheme.secondary
+                  : null,
+            ),
           ),
         ],
       ),
       body: SingleChildScrollView(
         child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Image.network(
               meal.imageUrl,
@@ -36,45 +44,68 @@ class MealDetailsScreen extends StatelessWidget {
               width: double.infinity,
               fit: BoxFit.cover,
             ),
-            SizedBox(height: 16),
-            Text(
-              'Ingredients',
-              style: Theme.of(context).textTheme.headlineLarge!.copyWith(
-                color: Theme.of(context).colorScheme.primary,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-            SizedBox(height: 2),
-            for (final ingredient in meal.ingredients)
-              Text(
-                ingredient,
-                style: Theme.of(context).textTheme.bodyMedium!.copyWith(
-                  color: Theme.of(context).colorScheme.onBackground,
+            const SizedBox(height: 16),
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16),
+              child: Text(
+                'Ingredients',
+                style: Theme.of(context).textTheme.headlineMedium!.copyWith(
+                  color: Theme.of(context).colorScheme.primary,
+                  fontWeight: FontWeight.bold,
                 ),
               ),
-
-            SizedBox(height: 24),
-            Text(
-              'Steps',
-              style: Theme.of(context).textTheme.headlineLarge!.copyWith(
-                color: Theme.of(context).colorScheme.primary,
-                fontWeight: FontWeight.bold,
-              ),
             ),
-            SizedBox(height: 14),
-            for (final step in meal.steps)
-              Padding(
-                padding: const EdgeInsets.symmetric(
-                  vertical: 8,
-                  horizontal: 12,
-                ),
-                child: Text(
-                  step,
-                  style: Theme.of(context).textTheme.bodyMedium!.copyWith(
-                    color: Theme.of(context).colorScheme.onBackground,
+            const SizedBox(height: 8),
+            ...meal.ingredients.map(
+              (ingredient) => Card(
+                margin: const EdgeInsets.symmetric(vertical: 4, horizontal: 16),
+                child: Padding(
+                  padding: const EdgeInsets.all(10),
+                  child: Text(
+                    ingredient,
+                    style: Theme.of(context).textTheme.bodyMedium!.copyWith(
+                      color: Theme.of(context).colorScheme.onSurfaceVariant,
+                    ),
                   ),
                 ),
               ),
+            ),
+            const SizedBox(height: 24),
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16),
+              child: Text(
+                'Steps',
+                style: Theme.of(context).textTheme.headlineMedium!.copyWith(
+                  color: Theme.of(context).colorScheme.primary,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+            ),
+            const SizedBox(height: 12),
+            ...meal.steps.map(
+              (step) => Padding(
+                padding: const EdgeInsets.symmetric(
+                  vertical: 6,
+                  horizontal: 16,
+                ),
+                child: Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const Icon(Icons.arrow_right),
+                    const SizedBox(width: 6),
+                    Expanded(
+                      child: Text(
+                        step,
+                        style: Theme.of(context).textTheme.bodyMedium!.copyWith(
+                          color: Theme.of(context).colorScheme.onBackground,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+            const SizedBox(height: 24),
           ],
         ),
       ),

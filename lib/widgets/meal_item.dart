@@ -1,97 +1,104 @@
 import 'package:flutter/material.dart';
 import 'package:meal_app/model/meal.dart';
-import 'package:meal_app/screens/meal_details.dart';
-import 'package:meal_app/widgets/meal_item_trait.dart';
-import 'package:transparent_image/transparent_image.dart';
 
 class MealItem extends StatelessWidget {
   const MealItem({super.key, required this.meal, required this.onSelectMeal});
 
   final Meal meal;
   final void Function(Meal meal) onSelectMeal;
+
   String get complexityText {
-    return meal.complexity.name[0].toUpperCase() +
-        meal.complexity.name.substring(1);
+    switch (meal.complexity) {
+      case Complexity.simple:
+        return 'Simple';
+      case Complexity.challenging:
+        return 'Challenging';
+      case Complexity.hard:
+        return 'Hard';
+    }
   }
 
-  String get affordability {
-    return meal.affordability.name[0].toUpperCase() +
-        meal.affordability.name.substring(1);
+  String get affordabilityText {
+    switch (meal.affordability) {
+      case Affordability.affordable:
+        return 'Affordable';
+      case Affordability.pricey:
+        return 'Pricey';
+      case Affordability.luxurious:
+        return 'Luxurious';
+    }
   }
 
   @override
   Widget build(BuildContext context) {
-    // quick debug - remove after verifying
-    // print('Building meal: ${meal.title}');
-
     return Card(
-      margin: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-      elevation: 4,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-      clipBehavior: Clip.hardEdge, // important to clip image to rounded corners
+      margin: const EdgeInsets.all(12),
+      clipBehavior: Clip.hardEdge,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
       child: InkWell(
-        onTap: () {
-          onSelectMeal(meal);
-        },
+        onTap: () => onSelectMeal(meal),
         child: Column(
-          // Use Column so the card has intrinsic height from the image
-          crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            // Constrain image height so it is visible
-            SizedBox(
-              height: 200,
-              width: double.infinity,
-              child: FadeInImage(
-                placeholder: MemoryImage(kTransparentImage),
-                image: NetworkImage(meal.imageUrl),
-                fit: BoxFit.cover, // fill the box
-                fadeInDuration: const Duration(milliseconds: 250),
-                imageErrorBuilder: (context, error, stackTrace) {
-                  // Show fallback if network image fails
-                  return Container(
-                    color: Theme.of(
-                      context,
-                    ).colorScheme.onBackground.withOpacity(0.05),
-                    alignment: Alignment.center,
-                    child: const Icon(Icons.broken_image, size: 48),
-                  );
-                },
-              ),
-            ),
-
-            // Title / metadata area
-            Container(
-              color: Colors.black87,
-              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.center,
-                children: [
-                  Text(
-                    meal.title,
-                    maxLines: 2,
-                    softWrap: true,
-                    overflow: TextOverflow.ellipsis,
-                    textAlign: TextAlign.center,
-                    style: const TextStyle(
-                      color: Colors.white,
-                      fontSize: 18,
-                      fontWeight: FontWeight.bold,
+            Stack(
+              children: [
+                Image.network(
+                  meal.imageUrl,
+                  height: 200,
+                  width: double.infinity,
+                  fit: BoxFit.cover,
+                ),
+                Positioned(
+                  bottom: 16,
+                  right: 16,
+                  left: 16,
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(
+                      vertical: 4,
+                      horizontal: 8,
+                    ),
+                    color: Colors.black54,
+                    child: Text(
+                      meal.title,
+                      style: const TextStyle(fontSize: 18, color: Colors.white),
+                      softWrap: true,
+                      overflow: TextOverflow.fade,
                     ),
                   ),
-                  const SizedBox(height: 8),
+                ),
+              ],
+            ),
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceAround,
+                children: [
                   Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      MealItemTrait(
-                        icon: Icons.schedule,
-                        label: '${meal.duration} min  ',
+                      const Icon(Icons.schedule),
+                      const SizedBox(width: 4),
+                      Text(
+                        '${meal.duration} min',
+                        style: TextStyle(color: Colors.white),
                       ),
-                      SizedBox(width: 12),
-                      MealItemTrait(icon: Icons.work, label: complexityText),
-                      SizedBox(width: 12),
-                      MealItemTrait(
-                        icon: Icons.attach_money,
-                        label: affordability,
+                    ],
+                  ),
+                  Row(
+                    children: [
+                      const Icon(Icons.work),
+                      const SizedBox(width: 4),
+                      Text(
+                        complexityText,
+                        style: TextStyle(color: Colors.white),
+                      ),
+                    ],
+                  ),
+                  Row(
+                    children: [
+                      const Icon(Icons.attach_money),
+                      const SizedBox(width: 4),
+                      Text(
+                        affordabilityText,
+                        style: TextStyle(color: Colors.white),
                       ),
                     ],
                   ),

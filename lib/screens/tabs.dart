@@ -61,10 +61,7 @@ class _TabsScreenState extends State<TabsScreen> {
     });
   }
 
-  Future<void> _setScreen(String identifier) async {
-    // close the drawer
-    Navigator.of(context).pop();
-
+  void _setScreen(String identifier) async {
     if (identifier == 'filters') {
       final result = await Navigator.of(context).push<Map<Filter, bool>>(
         MaterialPageRoute(
@@ -77,12 +74,16 @@ class _TabsScreenState extends State<TabsScreen> {
       setState(() {
         _activeFilters = result;
       });
+    } else if (identifier == 'meals') {
+      setState(() {
+        _selectedPageIndex = 0;
+      });
     }
   }
 
   @override
   Widget build(BuildContext context) {
-    // Filter meals based on active filters
+    // ✅ Filter meals based on active filters
     final availableMeals = dummyMeals.where((meal) {
       if (_activeFilters[Filter.glutenFree]! && !meal.isGlutenFree) {
         return false;
@@ -96,21 +97,18 @@ class _TabsScreenState extends State<TabsScreen> {
       if (_activeFilters[Filter.vegetarian]! && !meal.isVegetarian) {
         return false;
       }
-      // sugarFree is custom; if your Meal has such a flag, check it here
       return true;
     }).toList();
 
     late Widget activePageWidget;
 
     if (_selectedPageIndex == 0) {
-      // Categories tab
       activePageWidget = CategoriesScreen(
         availableMeals: availableMeals,
         toggleFavourite: _toggleMealsFavourite,
         isMealFavourite: _isMealFavourite,
       );
     } else {
-      // Favorites tab
       activePageWidget = MealsScreen(
         title: 'Your Favorites',
         meals: _favoriteMeals,

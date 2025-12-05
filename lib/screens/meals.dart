@@ -12,9 +12,6 @@ class MealsScreen extends StatelessWidget {
 
   final String? title;
   final List<Meal> meals;
-
-  /// This callback is provided by the parent (TabsScreen / CategoriesScreen)
-  /// and is responsible for handling navigation to MealDetailsScreen.
   final void Function(BuildContext, Meal) selectMeal;
 
   @override
@@ -35,7 +32,7 @@ class MealsScreen extends StatelessWidget {
             ),
             const SizedBox(height: 16),
             Text(
-              'Try selecting a different meal.',
+              'Try selecting a different category or change filters.',
               style: Theme.of(context).textTheme.bodyLarge!.copyWith(
                 color: Theme.of(context).colorScheme.onBackground,
               ),
@@ -52,7 +49,6 @@ class MealsScreen extends StatelessWidget {
           return MealItem(
             meal: meal,
             onSelectMeal: (meal) {
-              // Delegate handling to parent via callback
               selectMeal(ctx, meal);
             },
           );
