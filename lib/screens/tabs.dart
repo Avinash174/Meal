@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:meal_app/model/meal.dart';
 import 'package:meal_app/screens/categories.dart';
+import 'package:meal_app/screens/filters.dart';
 import 'package:meal_app/screens/meal_details.dart';
 import 'package:meal_app/screens/meals.dart';
+import 'package:meal_app/widgets/main_drawer.dart';
 
 class TabsScreen extends StatefulWidget {
   const TabsScreen({super.key});
@@ -22,26 +24,20 @@ class _TabsScreenState extends State<TabsScreen> {
     ).showSnackBar(SnackBar(content: Text(message)));
   }
 
-  // Toggle favourite state for a meal
   void _toggleMealsFavourite(Meal meal) {
     final isExisting = _favoriteMeals.contains(meal);
 
     setState(() {
       if (isExisting) {
-        setState(() {
-          _favoriteMeals.remove(meal);
-        });
+        _favoriteMeals.remove(meal);
         _showInfoMsg(context, 'Meal removed from favorites.');
       } else {
-        setState(() {
-          _favoriteMeals.add(meal);
-          _showInfoMsg(context, 'Meal added to favorites.');
-        });
+        _favoriteMeals.add(meal);
+        _showInfoMsg(context, 'Meal added to favorites.');
       }
     });
   }
 
-  // Helper to check if a meal is favourite
   bool _isMealFavourite(Meal meal) {
     return _favoriteMeals.contains(meal);
   }
@@ -56,18 +52,28 @@ class _TabsScreenState extends State<TabsScreen> {
     });
   }
 
+  void _setScreen(String identifier) {
+    if (identifier == 'filters') {
+      Navigator.of(context).pushReplacement(
+        MaterialPageRoute(builder: (ctx) => const FiltersScreen()),
+      );
+    } else if (identifier == 'meals') {
+      setState(() {
+        _selectedPageIndex = 0;
+      });
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     Widget activePageWidget;
 
     if (_selectedPageIndex == 0) {
-      // Categories page — pass callbacks so it can open Meals -> MealDetails correctly
       activePageWidget = CategoriesScreen(
         toggleFavourite: _toggleMealsFavourite,
         isMealFavourite: _isMealFavourite,
       );
     } else {
-      // Favorites page — show MealsScreen with only favorite meals
       activePageWidget = MealsScreen(
         title: 'Your Favorites',
         meals: _favoriteMeals,
@@ -87,6 +93,8 @@ class _TabsScreenState extends State<TabsScreen> {
 
     return Scaffold(
       appBar: AppBar(title: Text(_activePageTitle)),
+      drawer: MainDrawer(onSelectScreen: _setScreen),
+
       body: activePageWidget,
       bottomNavigationBar: BottomNavigationBar(
         currentIndex: _selectedPageIndex,
