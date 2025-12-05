@@ -3,7 +3,7 @@ import 'package:meal_app/screens/tabs.dart';
 import 'package:meal_app/widgets/main_drawer.dart';
 
 class FiltersScreen extends StatefulWidget {
-  const FiltersScreen({super.key});
+  const FiltersScreen({super.key, required Map<Filter, bool> currentFilters});
 
   @override
   State<FiltersScreen> createState() => _FiltersScreenState();

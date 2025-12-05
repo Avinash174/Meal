@@ -9,17 +9,19 @@ import 'package:meal_app/widgets/categories_grid.dart';
 class CategoriesScreen extends StatelessWidget {
   const CategoriesScreen({
     super.key,
+    required this.availableMeals,
     required this.toggleFavourite,
     required this.isMealFavourite,
   });
 
+  final List<Meal> availableMeals;
   final void Function(Meal meal) toggleFavourite;
   final bool Function(Meal meal) isMealFavourite;
 
   void _selectCategory(BuildContext context, Category category) {
-    final filteredMeals = dummyMeals
-        .where((meal) => meal.categories.contains(category.id))
-        .toList();
+    final filteredMeals = availableMeals.where((meal) {
+      return meal.categories.contains(category.id);
+    }).toList();
 
     Navigator.of(context).push(
       MaterialPageRoute(
@@ -53,12 +55,10 @@ class CategoriesScreen extends StatelessWidget {
         mainAxisSpacing: 20,
       ),
       children: [
-        for (final category in availableCategory) // ← FIXED HERE
+        for (final category in availableCategory)
           CategoryGridItem(
             category: category,
-            onSelectCategory: () {
-              _selectCategory(context, category);
-            },
+            onSelectCategory: () => _selectCategory(context, category),
           ),
       ],
     );
