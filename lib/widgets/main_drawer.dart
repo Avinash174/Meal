@@ -28,14 +28,14 @@ class MainDrawer extends StatelessWidget {
                 Icon(
                   Icons.fastfood,
                   size: 48,
-                  color: Theme.of(context).colorScheme.onPrimary,
+                  color: Theme.of(context).colorScheme.primary,
                 ),
                 const SizedBox(width: 18),
                 Text(
                   'Cooking Up!',
-                  style: Theme.of(context).textTheme.headlineLarge!.copyWith(
-                    color: Theme.of(context).colorScheme.onPrimary,
-                  ),
+                  style: Theme.of(
+                    context,
+                  ).textTheme.headlineLarge!.copyWith(color: Colors.white),
                 ),
               ],
             ),
