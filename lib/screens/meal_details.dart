@@ -7,16 +7,16 @@ class MealDetailsScreen extends ConsumerWidget {
   const MealDetailsScreen({
     super.key,
     required this.meal,
-    required this.toggleFavourite,
-    required this.isFavourite,
+    required this.toggleFavourite, required bool isFavourite,
   });
 
   final Meal meal;
   final void Function(Meal meal)? toggleFavourite;
-  final bool isFavourite;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final favouriteMeals = ref.watch(favouriteProvider);
+    final isFavourite = favouriteMeals.contains(meal);
     return Scaffold(
       appBar: AppBar(
         title: Text(meal.title),
