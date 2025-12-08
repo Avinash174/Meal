@@ -1,7 +1,9 @@
+// lib/screens/tabs.dart
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:meal_app/data/dummy_data.dart';
 import 'package:meal_app/model/meal.dart';
+import 'package:meal_app/provider/favorite_provider.dart';
+import 'package:meal_app/provider/filters_provider.dart';
 import 'package:meal_app/provider/meals_provider.dart';
 import 'package:meal_app/screens/categories.dart';
 import 'package:meal_app/screens/filters.dart';
@@ -18,39 +20,12 @@ class TabsScreen extends ConsumerStatefulWidget {
 
 class _TabsScreenState extends ConsumerState<TabsScreen> {
   int _selectedPageIndex = 0;
-  final List<Meal> _favoriteMeals = [];
 
-  Map<Filter, bool> _activeFilters = {
-    Filter.glutenFree: false,
-    Filter.lactoseFree: false,
-    Filter.vegan: false,
-    Filter.vegetarian: false,
-    Filter.sugarFree: false,
-  };
-
-  void _showInfoMsg(BuildContext context, String message) {
-    ScaffoldMessenger.of(context).clearSnackBars();
-    ScaffoldMessenger.of(
-      context,
-    ).showSnackBar(SnackBar(content: Text(message)));
-  }
-
-  void _toggleMealsFavourite(Meal meal) {
-    final isExisting = _favoriteMeals.contains(meal);
-
-    setState(() {
-      if (isExisting) {
-        _favoriteMeals.remove(meal);
-        _showInfoMsg(context, 'Meal removed from favorites.');
-      } else {
-        _favoriteMeals.add(meal);
-        _showInfoMsg(context, 'Meal added to favorites.');
-      }
-    });
-  }
+  // ---------- Helpers ----------
 
   bool _isMealFavourite(Meal meal) {
-    return _favoriteMeals.contains(meal);
+    final favoriteMeals = ref.watch(favouriteProvider);
+    return favoriteMeals.contains(meal);
   }
 
   String get _activePageTitle {
@@ -63,19 +38,16 @@ class _TabsScreenState extends ConsumerState<TabsScreen> {
     });
   }
 
+  // Drawer navigation
   void _setScreen(String identifier) async {
     if (identifier == 'filters') {
       final result = await Navigator.of(context).push<Map<Filter, bool>>(
-        MaterialPageRoute(
-          builder: (ctx) => FiltersScreen(currentFilters: _activeFilters),
-        ),
+        MaterialPageRoute(builder: (ctx) => FiltersScreen()),
       );
 
       if (result == null) return;
 
-      setState(() {
-        _activeFilters = result;
-      });
+      ref.read(filtersProvider.notifier).state = result;
     } else if (identifier == 'meals') {
       setState(() {
         _selectedPageIndex = 0;
@@ -83,10 +55,13 @@ class _TabsScreenState extends ConsumerState<TabsScreen> {
     }
   }
 
+  // ---------- Build ----------
+
   @override
   Widget build(BuildContext context) {
     final meals = ref.watch(mealsProvider);
-    // ✅ Filter meals based on active filters
+    // Apply filters
+    final _activeFilters = ref.watch(filtersProvider);
     final availableMeals = meals.where((meal) {
       if (_activeFilters[Filter.glutenFree]! && !meal.isGlutenFree) {
         return false;
@@ -100,27 +75,37 @@ class _TabsScreenState extends ConsumerState<TabsScreen> {
       if (_activeFilters[Filter.vegetarian]! && !meal.isVegetarian) {
         return false;
       }
+      // If you want to actually use sugarFree, add a property in Meal
+      // and check it here like the others.
       return true;
     }).toList();
 
     late Widget activePageWidget;
 
     if (_selectedPageIndex == 0) {
+      // Categories tab
       activePageWidget = CategoriesScreen(
         availableMeals: availableMeals,
-        toggleFavourite: _toggleMealsFavourite,
+        toggleFavourite: (meal) {
+          ref.read(favouriteProvider.notifier).toggleMeal(meal);
+        },
         isMealFavourite: _isMealFavourite,
       );
     } else {
+      // Favorites tab
+      final favoriteMeals = ref.watch(favouriteProvider);
+
       activePageWidget = MealsScreen(
         title: 'Your Favorites',
-        meals: _favoriteMeals,
+        meals: favoriteMeals,
         selectMeal: (ctx, meal) {
           Navigator.of(ctx).push(
             MaterialPageRoute(
               builder: (_) => MealDetailsScreen(
                 meal: meal,
-                toggleFavourite: _toggleMealsFavourite,
+                toggleFavourite: (meal) {
+                  ref.read(favouriteProvider.notifier).toggleMeal(meal);
+                },
                 isFavourite: _isMealFavourite(meal),
               ),
             ),

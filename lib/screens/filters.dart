@@ -1,17 +1,15 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:meal_app/provider/filters_provider.dart';
 
-enum Filter { glutenFree, lactoseFree, vegan, vegetarian, sugarFree }
-
-class FiltersScreen extends StatefulWidget {
-  const FiltersScreen({super.key, required this.currentFilters});
-
-  final Map<Filter, bool> currentFilters;
+class FiltersScreen extends ConsumerStatefulWidget {
+  const FiltersScreen({super.key});
 
   @override
-  State<FiltersScreen> createState() => _FiltersScreenState();
+  ConsumerState<FiltersScreen> createState() => _FiltersScreenState();
 }
 
-class _FiltersScreenState extends State<FiltersScreen> {
+class _FiltersScreenState extends ConsumerState<FiltersScreen> {
   late bool _isGlutenFree;
   late bool _isLactoseFree;
   late bool _isVegan;
@@ -21,21 +19,24 @@ class _FiltersScreenState extends State<FiltersScreen> {
   @override
   void initState() {
     super.initState();
-    _isGlutenFree = widget.currentFilters[Filter.glutenFree] ?? false;
-    _isLactoseFree = widget.currentFilters[Filter.lactoseFree] ?? false;
-    _isVegan = widget.currentFilters[Filter.vegan] ?? false;
-    _isVegetarian = widget.currentFilters[Filter.vegetarian] ?? false;
-    _isSugarFree = widget.currentFilters[Filter.sugarFree] ?? false;
+    final currentFilters = ref.read(filtersProvider);
+    _isGlutenFree = currentFilters[Filter.glutenFree] ?? false;
+    _isLactoseFree = currentFilters[Filter.lactoseFree] ?? false;
+    _isVegan = currentFilters[Filter.vegan] ?? false;
+    _isVegetarian = currentFilters[Filter.vegetarian] ?? false;
+    _isSugarFree = currentFilters[Filter.sugarFree] ?? false;
   }
 
   void _saveAndPop() {
-    Navigator.of(context).pop({
+    ref.read(filtersProvider.notifier).setFilters({
       Filter.glutenFree: _isGlutenFree,
       Filter.lactoseFree: _isLactoseFree,
       Filter.vegan: _isVegan,
       Filter.vegetarian: _isVegetarian,
       Filter.sugarFree: _isSugarFree,
     });
+
+    Navigator.of(context).pop(); // ✅ go back after saving
   }
 
   Widget _buildSwitchTile(
@@ -66,10 +67,11 @@ class _FiltersScreenState extends State<FiltersScreen> {
 
   @override
   Widget build(BuildContext context) {
+    // ✅ build signature must NOT have WidgetRef here
     return WillPopScope(
       onWillPop: () async {
-        _saveAndPop();
-        return false;
+        _saveAndPop(); // auto-save on system back
+        return false; // prevent default pop, we already popped
       },
       child: Scaffold(
         appBar: AppBar(
