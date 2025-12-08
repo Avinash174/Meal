@@ -1,54 +1,38 @@
 import 'package:flutter/material.dart';
-import 'package:meal_app/data/dummy_data.dart';
-import 'package:meal_app/model/category.dart';
-import 'package:meal_app/model/meal.dart';
-import 'package:meal_app/screens/meal_details.dart';
-import 'package:meal_app/screens/meals.dart';
-import 'package:meal_app/widgets/categories_grid.dart';
+
+import 'package:meals/data/dummy_data.dart';
+import 'package:meals/models/meal.dart';
+import 'package:meals/widgets/category_grid_item.dart';
+import 'package:meals/screens/meals.dart';
+import 'package:meals/models/category.dart';
 
 class CategoriesScreen extends StatelessWidget {
   const CategoriesScreen({
     super.key,
     required this.availableMeals,
-    required this.toggleFavourite,
-    required this.isMealFavourite,
   });
 
   final List<Meal> availableMeals;
-  final void Function(Meal meal) toggleFavourite;
-  final bool Function(Meal meal) isMealFavourite;
 
   void _selectCategory(BuildContext context, Category category) {
-    // ✅ IMPORTANT: filter from availableMeals, NOT dummyMeals
-    final filteredMeals = availableMeals.where((meal) {
-      return meal.categories.contains(category.id);
-    }).toList();
+    final filteredMeals = availableMeals
+        .where((meal) => meal.categories.contains(category.id))
+        .toList();
 
     Navigator.of(context).push(
       MaterialPageRoute(
-        builder: (_) => MealsScreen(
+        builder: (ctx) => MealsScreen(
           title: category.title,
           meals: filteredMeals,
-          selectMeal: (ctx, meal) {
-            Navigator.of(ctx).push(
-              MaterialPageRoute(
-                builder: (_) => MealDetailsScreen(
-                  meal: meal,
-                  toggleFavourite: toggleFavourite,
-                  isFavourite: isMealFavourite(meal),
-                ),
-              ),
-            );
-          },
         ),
       ),
-    );
+    ); // Navigator.push(context, route)
   }
 
   @override
   Widget build(BuildContext context) {
     return GridView(
-      padding: const EdgeInsets.all(16),
+      padding: const EdgeInsets.all(24),
       gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
         crossAxisCount: 2,
         childAspectRatio: 3 / 2,
@@ -56,11 +40,14 @@ class CategoriesScreen extends StatelessWidget {
         mainAxisSpacing: 20,
       ),
       children: [
-        for (final category in availableCategory)
+        // availableCategories.map((category) => CategoryGridItem(category: category)).toList()
+        for (final category in availableCategories)
           CategoryGridItem(
             category: category,
-            onSelectCategory: () => _selectCategory(context, category),
-          ),
+            onSelectCategory: () {
+              _selectCategory(context, category);
+            },
+          )
       ],
     );
   }

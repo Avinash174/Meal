@@ -1,26 +1,33 @@
-// lib/provider/filters_provider.dart
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'package:meals/providers/meals_provider.dart';
 
-enum Filter { glutenFree, lactoseFree, vegan, vegetarian, sugarFree }
+enum Filter {
+  glutenFree,
+  lactoseFree,
+  vegetarian,
+  vegan,
+}
 
 class FiltersNotifier extends StateNotifier<Map<Filter, bool>> {
   FiltersNotifier()
       : super({
           Filter.glutenFree: false,
           Filter.lactoseFree: false,
-          Filter.vegan: false,
           Filter.vegetarian: false,
-          Filter.sugarFree: false,
+          Filter.vegan: false
         });
 
-  void setFilters(Map<Filter, bool> updatedFilters) {
-    state = updatedFilters;
+  void setFilters(Map<Filter, bool> chosenFilters) {
+    state = chosenFilters;
   }
 
   void setFilter(Filter filter, bool isActive) {
-    state = {...state, filter: isActive};
+    // state[filter] = isActive; // not allowed! => mutating state
+    state = {
+      ...state,
+      filter: isActive,
+    };
   }
 }
 
@@ -29,7 +36,7 @@ final filtersProvider =
   (ref) => FiltersNotifier(),
 );
 
-final filterMealProvider = Provider<List>((ref) {
+final filteredMealsProvider = Provider((ref) {
   final meals = ref.watch(mealsProvider);
   final activeFilters = ref.watch(filtersProvider);
 
@@ -40,13 +47,12 @@ final filterMealProvider = Provider<List>((ref) {
     if (activeFilters[Filter.lactoseFree]! && !meal.isLactoseFree) {
       return false;
     }
-    if (activeFilters[Filter.vegan]! && !meal.isVegan) {
-      return false;
-    }
     if (activeFilters[Filter.vegetarian]! && !meal.isVegetarian) {
       return false;
     }
-
+    if (activeFilters[Filter.vegan]! && !meal.isVegan) {
+      return false;
+    }
     return true;
   }).toList();
 });
