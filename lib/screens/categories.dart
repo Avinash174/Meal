@@ -78,14 +78,14 @@ class _CategoriesScreenState extends State<CategoriesScreen>
             ),
         ],
       ),
-      builder: (context, child) {
-        return Padding(
-          padding: EdgeInsets.only(
-            top: 100 - (_animateController.value * 100),
-          ),
-          child: child, // ✅ actually show the GridView
-        );
-      },
+      builder: (context, child) => SlideTransition(
+        position: _animateController.drive(
+          // Slide from off-screen bottom (y = 1) to on-screen (Offset.zero)
+          Tween<Offset>(begin: const Offset(0, 1), end: Offset.zero) 
+              .chain(CurveTween(curve: Curves.easeOut)),
+        ),
+        child: child,
+      ),
     );
   }
 }
